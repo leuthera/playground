@@ -1,68 +1,90 @@
-/*global window, window.RUMpageId, window.RUMcollectedData, window.RUMsendDataTo */
+/*global window, window.RUM */
 
 (function ( window ) {
-    function RUM() {
-        'use strict';
+    'use strict';
 
-        var performance,
-            browserImplementation = [ 'performance', 'webkitPerformance', 'mozPerformance', 'msPerformance' ];
+    var app = {
+        init: function () {
+            var processor = app.attrReader( 'RUMprocessor' );
+            app.process( app.data(), processor );
+        },
 
-        browserImplementation.forEach(function ( value ) {
-            if ( window[ value ] ) performance = window[ value ];
-        });
+        attrReader: function ( name ) {
+            var attr = 'data-' + name,
+                node = document.querySelector( 'script[' + attr + ']');
 
-        if ( ! performance ) return;
+            return node ? node.getAttribute( attr ) : '';
+        },
 
-        // page
-        var pageId = window.RUMpageId,
-            uri    = {
-                host : location.host,
-                id   : pageId
-            };
+        performanceAPI: function () {
+            var performance,
+                browserImplementation = [ 'performance', 'webkitPerformance', 'mozPerformance', 'msPerformance' ];
 
-        // timeline
-        var timing = performance.timing,
-            times  = {};
-
-        times.loadTime         = timing.loadEventEnd - timing.fetchStart;
-        times.domReadyTime     = timing.domComplete  - timing.domInteractive;
-        times.domContentLoaded = times.loadTime      - times.domReadyTime;
-
-        // resources
-        var resources = [];
-        window.performance.getEntries().forEach(function ( value ) {
-            resources.push({
-                name      : value.name,
-                duration  : value.duration,
-                initiator : value.initiatorType
+            browserImplementation.forEach(function ( value ) {
+                if ( window[ value ] ) performance = window[ value ];
             });
-        });
 
-        // data
-        var data = {
-            uri       : uri,
-            times     : times,
-            resources : resources
-        };
+            return performance;
+        },
 
-        window.RUMcollectedData = data;
+        pageInfo: function () {
+            return {
+                host : window.location.host,
+                id   : app.attrReader( 'RUMid' )
+            };
+        },
 
-        // send data
-        if ( window.RUMsendDataTo ) {
-            if ( typeof window.RUMsendDataTo === 'function' ) {
-                window.RUMsendDataTo( data );
+        timeline: function ( API ) {
+            var timing = API.timing,
+                times  = {};
+
+            times.loadTime         = timing.loadEventEnd - timing.fetchStart;
+            times.domReadyTime     = timing.domComplete  - timing.domInteractive;
+            times.domContentLoaded = times.loadTime      - times.domReadyTime;
+
+            return times;
+        },
+
+        resources: function ( API ) {
+            return API.getEntries().map(function ( value ) {
+                return {
+                    name      : value.name,
+                    duration  : value.duration,
+                    initiator : value.initiatorType
+                };
+            });
+        },
+
+        data: function () {
+            var performance = app.performanceAPI();
+            if ( ! performance ) return {};
+
+            return {
+                page      : app.pageInfo( performance ),
+                times     : app.timeline( performance ),
+                resources : app.resources( performance )
+            };
+        },
+
+        process: function ( data, processor ) {
+            if ( ! processor ) return;
+
+            if ( typeof window[ processor ] === 'function' ) {
+                window[ processor ]( data );
             }
-            else {
+            else if ( typeof processor === 'string' && processor.match(/^http(s)?:/) ) {
                 var xhr = new XMLHttpRequest();
-                xhr.open( 'POST', window.RUMsendDataTo );
+
+                xhr.open( 'POST', processor );
                 xhr.setRequestHeader( 'Content-Type', 'application/json');
                 xhr.send( JSON.stringify( data ) );
             }
         }
-    }
+    };
 
-    // trigger delayed execution
+    window.RUM = app;
     window.addEventListener('load', function () {
-        return window.setTimeout(RUM, 100);
+        // trigger delayed execution to gather cruical data
+        return window.setTimeout(window.RUM.init, 100);
     }, false);
 }( window ));

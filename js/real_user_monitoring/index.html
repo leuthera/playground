@@ -1,115 +1,87 @@
 <html>
     <head>
-        <title>Simple RealUserMonitoring</title>
-        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
-        <style>
-            body { font-family: arial }
-            table { table-collapse: collapse }
-            td {
-                border: 1px solid #aaa;
-                padding: 5px;
-                background: #fff;
-            }
-            #scorecard {
-                width: 350px;
-                border: 1px solid grey;
-                padding: 5px;
-                background: #eee;
-            }
-            .fa-arrow-circle-o-down { color: green }
-            .fa-arrow-circle-o-up { color: red }
-
-            .old { font-size: 9px; }
-        </style>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.2.1/mustache.min.js"></script>
-        <script id="perf-template" type="text/template">
-            <table>
-                <tr>
-                    <td>loadTime</td>
-                    <td>{{ loadTime }}</td>
-                    <td><i class="fa fa-arrow-circle-o-{{ loadTime_trend }}"></i></td>
-                    <td class="old">{{ old_loadTime }}</td>
-                </tr>
-                 <tr>
-                    <td>domContentLoaded</td>
-                    <td>{{ domContentLoaded }}</td>
-                    <td><i class="fa fa-arrow-circle-o-{{ domContentLoaded_trend }}"></i></td>
-                    <td class="old">{{ old_domContentLoaded }}</td>
-                </tr>
-                <tr>
-                    <td>resources</td>
-                    <td>{{ resources }}</td>
-                    <td><i class="fa fa-arrow-circle-o-{{ resource_trend }}"></i></td>
-                    <td class="old">{{ old_resources }}</td>
-                </tr>
-            </table>
-        </script>
+        <title>RealUserMonitoring</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js"></script>
     </head>
     <body>
         <h1>RUM - Real User Monitoring</h1>
-        <div id='scorecard'>
-            <b>Resource-Req.</b><br>
-            <sub>FOOBARBAZ</sub>
-            <hr>
-            <div id="perf-data">
-
-            </div>
-        </div>
+        Reload this page some times to collect data and save them into localStorage.
+        <canvas id="myChart" width="400" height="100"></canvas>
         <script>
-            window.RUMpageId = 'PageIdentifier';
-            // window.RUMsendDataTo = '/post/url/'; // or handler-function
-            window.RUMsendDataTo = function (data) {
-                var storedData = [];
+            function fancyFNName(data) {
+                var oldData = JSON.parse( localStorage.getItem("json") ),
+                    newData = oldData || [];
 
-                localStorage.getItem("data")
-                    ? storedData = JSON.parse( localStorage.getItem("data") )
-                    : localStorage.setItem("data", JSON.stringify( storedData ));
+                newData.push( data );
+                localStorage.setItem( "json", JSON.stringify(newData) );
 
-                storedData.push( data );
-                localStorage.setItem("data", JSON.stringify( storedData ));
-            };
+                var labels = { loadTime: [], domReady: [] },
+                    points = { loadTime: [], domReady: [] };
 
-            // totally simple and stupid approach to save, receive and display data
-            var perf = {};
+                newData.forEach(function ( entry, idx ) {
+                    labels.loadTime.push( idx );
+                    labels.domReady.push( idx );
 
-            if ( localStorage.getItem("data") ) {
-                var storedData = JSON.parse( localStorage.getItem("data") );
-
-                var resources        = 0,
-                    loadTime         = 0,
-                    domContentLoaded = 0;
-
-                storedData.forEach(function ( entry ) {
-                    resources        += entry.resources.length
-                    loadTime         += entry.times.loadTime;
-                    domContentLoaded += entry.times.domContentLoaded;
+                    points.loadTime.push( entry.times.loadTime );
+                    points.domReady.push( entry.times.domReadyTime );
                 });
 
-                var oldValues;
-                if ( localStorage.getItem("perf") ) {
-                    oldValues = JSON.parse( localStorage.getItem("perf") );
+                var ctx = document.querySelector("#myChart");
+                var input = {
+                    labels: labels.loadTime,
+                    datasets: [
+                        {
+                            label: "loadTime",
+                            fill: false,
+                            lineTension: 0.1,
+                            backgroundColor: "rgba(75,192,192,0.4)",
+                            borderColor: "rgba(75,192,192,1)",
+                            borderCapStyle: 'butt',
+                            borderDash: [],
+                            borderDashOffset: 0.0,
+                            borderJoinStyle: 'miter',
+                            pointBorderColor: "rgba(75,192,192,1)",
+                            pointBackgroundColor: "#fff",
+                            pointBorderWidth: 1,
+                            pointHoverRadius: 5,
+                            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                            pointHoverBorderColor: "rgba(220,220,220,1)",
+                            pointHoverBorderWidth: 2,
+                            pointRadius: 1,
+                            pointHitRadius: 10,
+                            data: points.loadTime,
+                            spanGaps: false,
+                        },
+                        {
+                            label: "domReady",
+                            fill: false,
+                            lineTension: 0.1,
+                            backgroundColor: "rgba(75,192,192,0.4)",
+                            borderColor: "rgba(0, 255, 0, 1)",
+                            borderCapStyle: 'butt',
+                            borderDash: [],
+                            borderDashOffset: 0.0,
+                            borderJoinStyle: 'miter',
+                            pointBorderColor: "rgba(75,192,192,1)",
+                            pointBackgroundColor: "#fff",
+                            pointBorderWidth: 1,
+                            pointHoverRadius: 5,
+                            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                            pointHoverBorderColor: "rgba(220,220,220,1)",
+                            pointHoverBorderWidth: 2,
+                            pointRadius: 1,
+                            pointHitRadius: 10,
+                            data: points.domReady,
+                            spanGaps: false,
+                        }
 
-                    perf.old_resources        = oldValues.resources;
-                    perf.old_loadTime         = oldValues.loadTime;
-                    perf.old_domContentLoaded = oldValues.domContentLoaded;
+                    ]
                 };
-
-                perf.resources        = (resources / storedData.length).toFixed(2);
-                perf.loadTime         = (loadTime / storedData.length).toFixed(2);
-                perf.domContentLoaded = (domContentLoaded / storedData.length).toFixed(2);
-
-                perf.resource_trend         = perf.old_resources > perf.resources ? 'down' : 'up';
-                perf.loadTime_trend         = perf.old_loadTime > perf.loadTime ? 'down' : 'up';
-                perf.domContentLoaded_trend = perf.old_domContentLoaded > perf.domContentLoaded ? 'down' : 'up';
-
-                localStorage.setItem("perf", JSON.stringify( perf ));
+                var myLineChart = Chart.Line(ctx, {
+                    data: input
+                });
             }
-
-            var template = document.querySelector( '#perf-template' ).innerHTML,
-                html     = Mustache.to_html( template, perf );
-
-            document.querySelector( '#perf-data' ).innerHTML = html;
         </script>
-        <script src="rum.js" async></script>
+        <script src="rum.js" async data-RUMprocessor='fancyFNName' data-RUMid='pageID' async></script>
     </body>
 </html>
