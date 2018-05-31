@@ -1,0 +1,12 @@
+<a href="http://jakearchibald.com/2017/es-modules-in-browsers/">Modules in Browser</a>
+
+<br><br>
+
+<script type="module">
+    import {addTextToBody} from './utils.js';
+  
+    addTextToBody('Modules are pretty cool.');
+</script>
+<script nomodule>
+    alert('no support');
+</script>

@@ -1,0 +1,99 @@
+<img src="https://www.picclickimg.com/d/l400/pict/372229789898_/Minions-Einhorn-Fluffy-Ich-einfach-unverbesserlich-Pl%C3%BCsch-Stofftier.jpg">
+<button id="tab_focus">Tab-Focus</button>
+<button id="network">Network</button>
+<button id="vibrate">Vibrate</button>
+<button id="orientation">Orientation</button>
+<button id="ambient">Ambient</button>
+<button id="battery">Battery</button>
+<button id="gamepad">Gamepad</button>
+<br>
+Log:
+<div id="log" style="overflow:scroll;width:500px; height:200px; border:1px solid black;">
+
+</div>
+<script>
+    console.olog = console.log;
+    console.log = message => {
+        let elem = document.querySelector('#log');
+        elem.innerHTML += message + "<hr>";
+        elem.scrollTop = elem.scrollHeight;
+    };
+
+    let click_listener = elem => { elem.addEventListener( 'click', window[ elem.id ] ) };
+    document.querySelectorAll('button').forEach( click_listener );
+
+    function tab_focus() {
+        window.addEventListener('visibilitychange', () => {
+            if ( document.hidden ) {
+                console.log('is hidden');
+            }
+            else {
+                console.log('is focused');
+            }
+        });
+    }
+
+    function network() {
+        window.addEventListener('offline', network_status);
+        window.addEventListener('online', network_status);
+        function network_status(e) {
+            console.log(e.type);
+        }
+    }
+
+    function vibrate() {
+        navigator.vibrate([400,300,400,300,400,300]);
+    }
+
+    function orientation() {
+        let logo = document.querySelector('img');
+        window.addEventListener('deviceorientation', e => {
+            let tilt_lr = e.gamma;
+            let tilt_fb = e.beta;
+
+            logo.style.transform = `
+                rotate(${tilt_lr}deg)
+                rotate3d(1,0,0, ${tilt_fb * -1}deg)
+            `;
+        });
+    }
+
+    function ambient() {
+        window.addEventListener('devicelight', e => {
+            console.log(e.value, 'lux');
+        });
+        try {
+            let sensor = new AmbientLightSensor();
+            sensor.start();
+            sensor.onchange = e => {
+                console.log(e.reading.illuminance);
+            }
+        }
+        catch (e) {
+            console.log('AmbientLighSensor not supported')
+        }
+        //sensor.stop();
+    }
+
+    function battery() {
+        navigator.getBattery().then(battery => {
+            console.log(battery.level * 100, '%');
+            battery.addEventListener('levelchange', () => {
+                console.log(this.level * 100, '%');
+            });
+        });
+    }
+
+    function gamepad() {
+        window.addEventListener('gamepadconnected', game_loop);
+        function game_loop() {
+            let pad = navigator.getGamepads()[0];
+
+            if ( pad.buttons[0].pressed ) {
+                console.log('X');
+            }
+
+            requestAnimationFrame(game_loop);
+        }
+    }
+</script>
