@@ -1,0 +1,15 @@
+{
+  "name": "launchdarkly",
+  "version": "1.0.0",
+  "description": "",
+  "main": "flickr_cats.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ldclient-node": "^5.0.0",
+    "node-fetch": "^2.1.2"
+  }
+}
