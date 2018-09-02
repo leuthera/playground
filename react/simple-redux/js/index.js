@@ -5,6 +5,15 @@ import Simple from './simple';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 
+/* HowTo:
+    - create a store
+    - create reducer and handle actions
+    - provide the store to the app
+    - connect component to redux
+    - provide mapStateToProps fn
+    - dispatch actions
+*/
+
 const initials = {
     counter: 0
 };
