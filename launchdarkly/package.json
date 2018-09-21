@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ldclient-node": "^5.0.0",
+    "ldclient-node": "^5.4.2",
     "node-fetch": "^2.1.2"
   }
 }
