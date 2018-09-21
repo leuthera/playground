@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="manifest" href="manifest.json">
+        <style>
+            body {
+                background: rgb(163, 233, 255);
+                font-family: 'Courier New', Courier, monospace;
+                font-size: 5vw;
+                font-weight: bold;
+            }
+
+            .hidden {
+                visibility: hidden;
+            }
+
+            .selected-card {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                text-align: center;
+                font-size: 40vw;
+                flex-direction: column;
+            }
+
+            .cards {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center
+            }
+        
+            .card {
+                flex: 1 0 150px;
+                text-align: center;
+                border: 1px solid grey;
+                border-radius: 3px;
+                background: rgb(200, 200, 200);
+                box-sizing: border-box;
+                margin: 1rem .25em;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="root"></div>
+        <script src="dist/app.js?9"></script>
+        <script>
+            if ( 'serviceWorker' in navigator ) {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function () {
+                        console.log('Service Worker Registered');
+                    });
+            }
+        </script>
+    </body>
+</html>
