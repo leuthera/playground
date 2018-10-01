@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Text2Speech</title>
+</head>
+<body>
+    <form>
+        <input type="text">
+        <select>
+            <option>de-DE</option>
+            <option>en-US</option>
+        </select>
+        <button type="submit">Text2Speech</a>
+    </form>
+
+    <audio src="" hidden></audio>
+
+    <script type="module">
+        const select = el => document.querySelector(el);
+
+        const text2speech = e => {
+            e.preventDefault();
+
+            let text     = select('input').value;
+            let lang     = select('select').value;
+            let api_call = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${ lang }&client=tw-ob&q=${ text }`;
+            let audio    = document.querySelector('audio');
+
+            audio.src = api_call;
+            audio.play();
+        };
+
+        select('form')
+            .addEventListener('submit', text2speech, false);
+    </script>
+</body>
+</html>
