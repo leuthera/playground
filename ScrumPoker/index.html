@@ -51,14 +51,9 @@
     </head>
     <body>
         <div id="root"></div>
+        <button disabled class="jss_push">
+            Enable Push Messaging
+        </button>
         <script src="dist/app.js?9"></script>
-        <script>
-            if ( 'serviceWorker' in navigator ) {
-                navigator.serviceWorker.register('sw.js')
-                    .then(function () {
-                        console.log('Service Worker Registered');
-                    });
-            }
-        </script>
     </body>
 </html>

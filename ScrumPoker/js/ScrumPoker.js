@@ -24,26 +24,26 @@ class ScrumPoker extends React.Component {
         if ( typeof window.DeviceMotionEvent !== 'undefined' ) {
             // Shake sensitivity (a lower number is more)
             let sensitivity = 80;
-        
+
             // Position variables
             let x1 = 0, y1 = 0, z1 = 0, x2 = 0, y2 = 0, z2 = 0;
-        
+
             // Listen to motion events and update the position
             window.addEventListener('devicemotion', e => {
                 x1 = e.accelerationIncludingGravity.x;
                 y1 = e.accelerationIncludingGravity.y;
                 z1 = e.accelerationIncludingGravity.z;
             }, false);
-        
+
             // Periodically check the position and fire
             // if the change is greater than the sensitivity
             window.setInterval(() => {
                 var change = Math.abs(x1-x2+y1-y2+z1-z2);
-        
+
                 if (change > sensitivity) {
                     this.setState({ hidden: false });
                 }
-        
+
                 // Update new position
                 x2 = x1;
                 y2 = y1;
@@ -57,12 +57,12 @@ class ScrumPoker extends React.Component {
             <React.Fragment>
                 {
                     typeof this.state.pickedCard !== 'number'
-                    ? 
+                    ?
                         <section className="cards">
-                            { 
-                                this.cards.entries ? 
+                            {
+                                this.cards.entries ?
                                     this.cards.map( value =>
-                                        <article 
+                                        <article
                                             onClick   = { () => { this.setState({ pickedCard: value }); this.detectShake(); } }
                                             key       = { value }
                                             className = "card">
@@ -75,7 +75,7 @@ class ScrumPoker extends React.Component {
                                 : null
                             }
                         </section>
-                    : 
+                    :
                         <section
                             onClick   = { this.poker }
                             className ="selected-card">
