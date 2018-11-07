@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Puppeteer test</title>
+</head>
+<body>
+    <input type="text" name="name" id="">
+    <input type="text" name="age" id="">
+    <button>Show</button>
+    <span id="msg"></span>
+    <script type="module">
+        const doc_bind = method => document[ method ].bind( document );
+        let qA         = doc_bind( 'querySelectorAll' );
+        let q          = doc_bind( 'querySelector' );
+
+        q( 'button' ).addEventListener('click', e =>
+            q( '#msg' ).innerHTML = Array.from(
+                qA( 'input' )
+            ).reduce(
+                ( prev, curr ) => prev + '' + curr.value, ''
+            )
+        );
+    </script>
+</body>
+</html>
