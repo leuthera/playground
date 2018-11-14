@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>History-API</title>
+</head>
+<body>
+    <ul>
+        <li><a data-name="req1" href="#">Req1</a></li>
+        <li><a data-name="req2" href="#">Req2</a></li>
+        <li><a data-name="req3" href="#">Req3</a></li>
+    </ul>
+    <span id="response"></span>
+    <script type="module">
+        const get_data = async ressource => {
+            let response = await fetch(ressource + '.json');
+            let json = await response.json();
+
+            return json.name;
+        }
+
+        let current_state = null;
+
+        [...document.querySelectorAll('a')].forEach(el => { el.addEventListener('click', async e => {
+            const ressource = el.dataset.name;
+            if ( ressource !== current_state ) {
+                current_state = ressource;
+                window.history.pushState(current_state, 'title');
+                document.querySelector('#response').innerHTML = await get_data(ressource);
+            }
+            e.preventDefault();
+        })});
+
+        window.addEventListener('popstate', async e => {
+            if ( e.state !== null ) {
+                current_state = e.state;
+                document.querySelector('#response').innerHTML = await get_data(e.state);
+            }
+        });
+    </script>
+</body>
+</html>
