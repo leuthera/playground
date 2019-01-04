@@ -1,0 +1,74 @@
+<style>
+    input { width: 125px }
+    button { width: 25px; margin: 2px}
+</style>
+<form>
+    <input>
+    <br>
+    <button type="button" class="js_clear">c</button>
+    <button type="button" class="js_remove">&lt;</button>
+    <button type="button" data-value="/">/</button>
+    <button type="button" data-value="*">x</button>
+    <br>
+    <button type="button" data-value="7">7</button>
+    <button type="button" data-value="8">8</button>
+    <button type="button" data-value="9">9</button>
+    <button type="button" data-value="-">-</button>
+    <br>
+    <button type="button" data-value="4">4</button>
+    <button type="button" data-value="5">5</button>
+    <button type="button" data-value="6">6</button>
+    <button type="button" data-value="+">+</button>
+    <br>
+    <button type="button" data-value="1">1</button>
+    <button type="button" data-value="2">2</button>
+    <button type="button" data-value="3">3</button>
+    <br>
+    <button type="button" data-value="0">0</button>
+    <button type="button" data-value=".">,</button>
+    <button type="submit">=</button>
+</form>
+<script>
+    const insert = num => {
+    const result = document.querySelector('input');
+        result.value = result.value + num
+    }
+
+    const calculate = e => {
+        e.preventDefault();
+
+        const result = document.querySelector('input');
+        try {
+            validate( result.value );
+            result.value = eval( result.value );
+        } catch ( err ) {
+            alert( err );
+        }
+    }
+
+    const clearInput = () => {
+        document.querySelector('input').value = "";
+    }
+
+    const validate = str => {
+        if ( ! /^[0-9+\-*.\/]+$/.test( str ) ) {
+            throw "Allowed input: 0-9 [+-./*]";
+        }
+    }
+
+    const removeLast = () => {
+    const el = document.querySelector('input')
+        el.value = el.value.slice(0,-1);
+    }
+
+    document.querySelector('.js_clear').addEventListener('click', clearInput);
+    document.querySelector('.js_remove').addEventListener('click', removeLast);
+    document.querySelector('form').addEventListener('submit', calculate);
+
+    Array.from( document.querySelectorAll( 'button[data-value]' ) ).forEach( button => {
+        button.addEventListener('click', e => {
+            insert( button.dataset.value );
+            document.querySelector('input').focus();
+        });
+    });
+</script>
