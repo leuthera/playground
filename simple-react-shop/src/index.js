@@ -16,22 +16,24 @@ const ShoppingCart = lazy(() =>
 
 function App() {
   return (
-    <ContextProvider>
-      <div className="App">
-        <ToDo />
-        <BrowserRouter>
-          <Fragment>
-            <Navi />
-            <Suspense fallback={<Loader />}>
-              <Switch>
-                <Route exact path="/" component={() => <BookList />} />
-                <Route path="/cart" component={() => <ShoppingCart />} />
-              </Switch>
-            </Suspense>
-          </Fragment>
-        </BrowserRouter>
-      </div>
-    </ContextProvider>
+    <Fragment>
+      <ContextProvider>
+        <div className="App">
+          <ToDo />
+          <BrowserRouter>
+            <Fragment>
+              <Navi />
+              <Suspense fallback={<Loader />}>
+                <Switch>
+                  <Route exact path="/" component={() => <BookList />} />
+                  <Route path="/cart" component={() => <ShoppingCart />} />
+                </Switch>
+              </Suspense>
+            </Fragment>
+          </BrowserRouter>
+        </div>
+      </ContextProvider>
+    </Fragment>
   );
 }
 
