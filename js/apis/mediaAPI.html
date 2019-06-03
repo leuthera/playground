@@ -7,9 +7,12 @@
         <title>getUserMedia</title>
     </head>
     <body>
+        <canvas id="canvas" width="150" height="300"></canvas>
         <script>
             async function getAudio() {
                 let stream = null;
+
+                const ctx = document.querySelector( "#canvas" ).getContext("2d");
 
                 try {
                     // https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
@@ -39,15 +42,26 @@
                         // fill array with freq data
                         analyser.getByteFrequencyData( array );
 
-                        const volumeSum = array.reduce( ( prev, curr ) => prev += curr, 0 );
-                        const average = volumeSum / array.length;
+                        const volumeSum     = array.reduce( ( prev, curr ) => prev += curr, 0 );
+                        const average       = volumeSum / array.length;
+                        const roundedVolume = Math.round( average );
 
-                        console.log( Math.round( average ) );
+                        renderVolumeMeter( ctx, roundedVolume )
+                        console.log( roundedVolume );
                     }
                 }
                 catch( err ) {
                     console.log( "The following error occured: ", err.name );
                 }
+            }
+
+            function renderVolumeMeter( ctx, volume ) {
+                ctx.clearRect(0, 0, 150, 300);
+                ctx.fillStyle = 'green';
+                ctx.fillRect(0, 300 - volume, 150, 300);
+                ctx.fillStyle = 'red';
+                ctx.font = "48px Arial";
+                ctx.fillText(volume, -2, 300);
             }
 
             getAudio();
