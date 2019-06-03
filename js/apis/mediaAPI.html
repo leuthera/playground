@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>getUserMedia</title>
+    </head>
+    <body>
+        <script>
+            async function getAudio() {
+                let stream = null;
+
+                try {
+                    // https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
+                    stream = await navigator.mediaDevices.getUserMedia( { audio: true } );
+
+                    // https://developer.mozilla.org/de/docs/Web/API/AudioContext
+                    audioContext     = new AudioContext();
+                    // https://developer.mozilla.org/de/docs/Web/API/AudioContext/createAnalyser
+                    // https://developer.mozilla.org/de/docs/Web/API/AnalyserNode
+                    analyser         = audioContext.createAnalyser();
+                    // https://developer.mozilla.org/de/docs/Web/API/AudioContext/createMediaStreamSource
+                    microphone       = audioContext.createMediaStreamSource( stream );
+                    // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createScriptProcessor
+                    // update to https://webaudio.github.io/web-audio-api/#audioworklet ???
+                    audioProceccesor = audioContext.createScriptProcessor( 2048, 1, 1 );
+
+                    analyser.smoothingTimeConstant = 0.8; // default
+                    // https://en.wikipedia.org/wiki/Fast_Fourier_transform
+                    analyser.fftSize               = 1024;
+
+                    microphone.connect( analyser );
+                    analyser.connect( audioProceccesor );
+                    audioProceccesor.connect( audioContext.destination );
+
+                    audioProceccesor.onaudioprocess = () => {
+                        const array = new Uint8Array( analyser.frequencyBinCount );
+                        // fill array with freq data
+                        analyser.getByteFrequencyData( array );
+
+                        const volumeSum = array.reduce( ( prev, curr ) => prev += curr, 0 );
+                        const average = volumeSum / array.length;
+
+                        console.log( Math.round( average ) );
+                    }
+                }
+                catch( err ) {
+                    console.log( "The following error occured: ", err.name );
+                }
+            }
+
+            getAudio();
+        </script>
+    </body>
+</html>
