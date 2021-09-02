@@ -13,7 +13,7 @@
     "babel-eslint": "^10.0.1",
     "eslint": "^4.19.1",
     "eslint-plugin-react": "^7.10.0",
-    "immer": "^2.0.0",
+    "immer": "^9.0.6",
     "lru-cache": "^5.1.1",
     "md5": "^2.2.1",
     "parcel-bundler": "^1.11.0",
